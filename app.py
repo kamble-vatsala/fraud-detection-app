@@ -1,8 +1,4 @@
-# ============================================
-# UPDATED APP.PY - FIXED FOR NEWER PANDAS
-# ============================================
-
-fixed_app_content = '''import streamlit as st
+import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
@@ -95,7 +91,7 @@ def load_model():
 model = load_model()
 
 # ============================================
-# 1. DASHBOARD VIEW - FIXED
+# 1. DASHBOARD VIEW
 # ============================================
 if app_mode == "🏠 Dashboard":
     st.header("📊 Transaction Dashboard")
@@ -104,7 +100,7 @@ if app_mode == "🏠 Dashboard":
     np.random.seed(42)
     n_transactions = 1000
     
-    # Generate realistic-looking data - FIXED freq parameter
+    # Generate realistic-looking data
     start_date = datetime(2024, 1, 1)
     time_list = [start_date + timedelta(minutes=5*i) for i in range(n_transactions)]
     
@@ -529,19 +525,3 @@ st.markdown("""
     <p>Model: XGBoost | PR-AUC: 84.3% | ROC-AUC: 97.5%</p>
 </div>
 """, unsafe_allow_html=True)
-'''
-
-# Save the fixed app
-with open('app_fixed.py', 'w') as f:
-    f.write(fixed_app_content)
-
-print("✅ Fixed app.py created!")
-
-# Download it
-from google.colab import files
-files.download('app_fixed.py')
-
-print("\n" + "="*60)
-print("📥 Download complete! Upload 'app_fixed.py' to your GitHub repository.")
-print("Rename it to 'app.py' when uploading.")
-print("="*60)
