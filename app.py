@@ -1,10 +1,14 @@
-import streamlit as st
+# ============================================
+# UPDATED APP.PY - FIXED FOR NEWER PANDAS
+# ============================================
+
+fixed_app_content = '''import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -91,7 +95,7 @@ def load_model():
 model = load_model()
 
 # ============================================
-# 1. DASHBOARD VIEW
+# 1. DASHBOARD VIEW - FIXED
 # ============================================
 if app_mode == "🏠 Dashboard":
     st.header("📊 Transaction Dashboard")
@@ -100,11 +104,14 @@ if app_mode == "🏠 Dashboard":
     np.random.seed(42)
     n_transactions = 1000
     
-    # Generate realistic-looking data
+    # Generate realistic-looking data - FIXED freq parameter
+    start_date = datetime(2024, 1, 1)
+    time_list = [start_date + timedelta(minutes=5*i) for i in range(n_transactions)]
+    
     transactions = pd.DataFrame({
         'Transaction ID': [f'TXN{str(i).zfill(8)}' for i in range(1, n_transactions+1)],
         'Amount': np.random.exponential(100, n_transactions),
-        'Time': pd.date_range(start='2024-01-01', periods=n_transactions, freq='5T'),
+        'Time': time_list,
         'Merchant': np.random.choice(['Amazon', 'Walmart', 'Target', 'Netflix', 'Starbucks', 'Apple', 'Google'], n_transactions),
         'Location': np.random.choice(['US', 'UK', 'CA', 'AU', 'DE', 'FR', 'JP'], n_transactions)
     })
@@ -202,7 +209,7 @@ if app_mode == "🏠 Dashboard":
         st.success("✅ No recent fraud alerts detected!")
 
 # ============================================
-# 2. SINGLE PREDICTION - FIXED (No Scaler)
+# 2. SINGLE PREDICTION
 # ============================================
 elif app_mode == "🔍 Single Prediction":
     st.header("🔍 Single Transaction Analysis")
@@ -240,18 +247,16 @@ elif app_mode == "🔍 Single Prediction":
                     np.random.seed(hash(transaction_id) % 2**32)
                     
                     # Create 30 features with realistic values
-                    # These are generated based on the transaction pattern
                     features = np.random.randn(30) * 0.5
                     
                     # Set Time and Amount (features 0 and 29)
-                    # Normalize them to match training data scale
-                    features[0] = (time - 94813.86) / 47488.15  # Standardized time
-                    features[-1] = (amount - 88.35) / 250.12    # Standardized amount
+                    features[0] = (time - 94813.86) / 47488.15
+                    features[-1] = (amount - 88.35) / 250.12
                     
                     # Reshape for prediction
                     features_reshaped = features.reshape(1, -1)
                     
-                    # Predict directly (no scaler needed)
+                    # Predict directly
                     prediction = model.predict(features_reshaped)[0]
                     probability = model.predict_proba(features_reshaped)[0][1]
                     
@@ -326,7 +331,6 @@ elif app_mode == "🔍 Single Prediction":
                         
                 except Exception as e:
                     st.error(f"❌ Error during analysis: {str(e)}")
-                    st.info("Please check that the model file is correctly loaded.")
 
 # ============================================
 # 3. BATCH ANALYSIS
@@ -357,7 +361,7 @@ elif app_mode == "📊 Batch Analysis":
                         try:
                             X = df.drop('Class', axis=1) if 'Class' in df.columns else df
                             
-                            # Predict directly (data should already be scaled)
+                            # Predict directly
                             predictions = model.predict(X)
                             probabilities = model.predict_proba(X)[:, 1]
                             
@@ -473,7 +477,6 @@ elif app_mode == "📈 Model Performance":
     
     if model:
         try:
-            # Get feature names
             feature_names = [f'V{i}' for i in range(1, 29)] + ['Time', 'Amount']
             
             feature_importance = pd.DataFrame({
@@ -526,3 +529,19 @@ st.markdown("""
     <p>Model: XGBoost | PR-AUC: 84.3% | ROC-AUC: 97.5%</p>
 </div>
 """, unsafe_allow_html=True)
+'''
+
+# Save the fixed app
+with open('app_fixed.py', 'w') as f:
+    f.write(fixed_app_content)
+
+print("✅ Fixed app.py created!")
+
+# Download it
+from google.colab import files
+files.download('app_fixed.py')
+
+print("\n" + "="*60)
+print("📥 Download complete! Upload 'app_fixed.py' to your GitHub repository.")
+print("Rename it to 'app.py' when uploading.")
+print("="*60)
